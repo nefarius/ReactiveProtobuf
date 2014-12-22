@@ -59,6 +59,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Protocol\IChannel.cs" />
+    <Compile Include="Protocol\ProtobufChannel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
