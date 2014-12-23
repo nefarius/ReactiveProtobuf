@@ -1,56 +1,61 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Reflection;
-using System.Security;
 using System.Security.Cryptography;
-using System.Text;
-using ReactiveSockets;
-using ProtoBuf;
+using System.Threading.Tasks;
 using Libarius.Compression.QuickLZ;
 using Libarius.Cryptography;
-using System.Threading.Tasks;
+using ProtoBuf;
 using ReactiveProtobuf.Protocol.Exceptions;
+using ReactiveSockets;
 
 namespace ReactiveProtobuf.Protocol
 {
     public class ProtobufChannel<T> : IChannel<T>
     {
-        private readonly IReactiveSocket _socket;
+        private readonly string _encKey;
         private readonly bool _isCompressed;
         private readonly bool _isEncrypted;
-        private readonly string _encKey;
+        private readonly IReactiveSocket _socket;
 
         public ProtobufChannel(IReactiveSocket socket, bool isCompressed)
             : this(socket, isCompressed, false, null)
-        { }
+        {
+        }
 
-        public ProtobufChannel(IReactiveSocket socket, bool isCompressed = false, bool isEncrypted = false, string encKey = "")
+        public ProtobufChannel(IReactiveSocket socket, bool isCompressed = false, bool isEncrypted = false,
+            string encKey = "")
         {
             _socket = socket;
             _isCompressed = isCompressed;
             _isEncrypted = isEncrypted;
             _encKey = encKey;
 
-            Receiver = from header in socket.Receiver.Buffer(sizeof(int))
-                       let retval = BitConverter.ToInt32(header.ToArray(), 0)
-                       let length = (retval >= 0) ? retval : 0
-                       let body = socket.Receiver.Take(length)
-                       select CreateObject(body.ToEnumerable().ToArray());
+            Receiver = from header in socket.Receiver.Buffer(sizeof (int))
+                let retval = BitConverter.ToInt32(header.ToArray(), 0)
+                let length = (retval >= 0) ? retval : 0
+                let body = socket.Receiver.Take(length)
+                select CreateObject(body.ToEnumerable().ToArray());
+        }
+
+        public IObservable<T> Receiver { get; private set; }
+
+        public Task SendAsync(T message)
+        {
+            return _socket.SendAsync(Convert(message));
         }
 
         private static byte[] GetBytes(string str)
         {
-            byte[] bytes = new byte[str.Length * sizeof(char)];
+            var bytes = new byte[str.Length*sizeof (char)];
             Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
             return bytes;
         }
 
         private T CreateObject(byte[] buffer)
         {
-            byte[] data = buffer;
+            var data = buffer;
 
             if (_isEncrypted)
             {
@@ -60,7 +65,8 @@ namespace ReactiveProtobuf.Protocol
                 }
                 catch (CryptographicException)
                 {
-                    throw new ProtobufChannelEncryptionException("Object integrity invalid, maybe supplied wrong encryption key?");
+                    throw new ProtobufChannelEncryptionException(
+                        "Object integrity invalid, maybe supplied wrong encryption key?");
                 }
             }
 
@@ -73,13 +79,6 @@ namespace ReactiveProtobuf.Protocol
             {
                 return Serializer.Deserialize<T>(ms);
             }
-        }
-
-        public IObservable<T> Receiver { get; private set; }
-
-        public Task SendAsync(T message)
-        {
-            return _socket.SendAsync(Convert(message));
         }
 
         private byte[] Convert(T obj)

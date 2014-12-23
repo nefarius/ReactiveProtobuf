@@ -17,7 +17,7 @@ namespace TestClient
         {
             var client = new ReactiveClient("localhost", 41337);
 
-            var protocol = new ProtobufChannel<Person>(client, true, true, "12345");
+            var protocol = new ProtobufChannel<Person>(client, true, true, "1234");
 
             protocol.Receiver.SubscribeOn(TaskPoolScheduler.Default).Subscribe(person =>
             {
