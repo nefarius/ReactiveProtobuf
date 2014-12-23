@@ -93,7 +93,11 @@ namespace ReactiveProtobuf.Protocol
                 data = AesHelper.AesEncrypt(data, GetBytes(_encKey.ToString()));
             }
 
-            return data;
+            var body = data;
+            var header = BitConverter.GetBytes(body.Length);
+            var payload = header.Concat(body).ToArray();
+
+            return payload;
         }
     }
 }
