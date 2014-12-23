@@ -70,7 +70,30 @@ namespace ReactiveProtobuf.Protocol
 
         public Task SendAsync(T message)
         {
-            throw new NotImplementedException();
+            return _socket.SendAsync(Convert(message));
+        }
+
+        private byte[] Convert(T obj)
+        {
+            byte[] data;
+
+            using (var ms = new MemoryStream())
+            {
+                Serializer.Serialize(ms, obj);
+                data = ms.ToArray();
+            }
+
+            if (_isCompressed)
+            {
+                data = QuickLZ.compress(data, 1);
+            }
+
+            if (_isEncrypted)
+            {
+                data = AesHelper.AesEncrypt(data, GetBytes(_encKey.ToString()));
+            }
+
+            return data;
         }
     }
 }
