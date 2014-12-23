@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Security;
 using System.Text;
 using ReactiveProtobuf.Protocol;
 using ReactiveSockets;
@@ -15,7 +16,8 @@ namespace TestClient
         static void Main(string[] args)
         {
             var client = new ReactiveClient("localhost", 41337);
-            var protocol = new ProtobufChannel<Person>(client);
+
+            var protocol = new ProtobufChannel<Person>(client, true, true, "12345");
 
             protocol.Receiver.SubscribeOn(TaskPoolScheduler.Default).Subscribe(person =>
             {

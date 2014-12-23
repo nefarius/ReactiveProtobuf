@@ -18,7 +18,7 @@ namespace TestServer
             {
                 Console.WriteLine("New socket connected {0}", socket.GetHashCode());
 
-                var protocol = new ProtobufChannel<Person>(socket);
+                var protocol = new ProtobufChannel<Person>(socket, true, true, "1234");
 
                 protocol.Receiver.Subscribe(person =>
                 {

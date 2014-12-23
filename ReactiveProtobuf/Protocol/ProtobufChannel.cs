@@ -5,12 +5,14 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Security;
+using System.Security.Cryptography;
 using System.Text;
 using ReactiveSockets;
 using ProtoBuf;
 using Libarius.Compression.QuickLZ;
 using Libarius.Cryptography;
 using System.Threading.Tasks;
+using ReactiveProtobuf.Protocol.Exceptions;
 
 namespace ReactiveProtobuf.Protocol
 {
@@ -19,13 +21,13 @@ namespace ReactiveProtobuf.Protocol
         private readonly IReactiveSocket _socket;
         private readonly bool _isCompressed;
         private readonly bool _isEncrypted;
-        private readonly SecureString _encKey;
+        private readonly string _encKey;
 
         public ProtobufChannel(IReactiveSocket socket, bool isCompressed)
             : this(socket, isCompressed, false, null)
         { }
 
-        public ProtobufChannel(IReactiveSocket socket, bool isCompressed = false, bool isEncrypted = false, SecureString encKey = null)
+        public ProtobufChannel(IReactiveSocket socket, bool isCompressed = false, bool isEncrypted = false, string encKey = "")
         {
             _socket = socket;
             _isCompressed = isCompressed;
@@ -52,7 +54,14 @@ namespace ReactiveProtobuf.Protocol
 
             if (_isEncrypted)
             {
-                data = AesHelper.AesDecrypt(data, GetBytes(_encKey.ToString()));
+                try
+                {
+                    data = AesHelper.AesDecrypt(data, GetBytes(_encKey));
+                }
+                catch (CryptographicException)
+                {
+                    throw new ProtobufChannelEncryptionException("Object integrity invalid, maybe supplied wrong encryption key?");
+                }
             }
 
             if (_isCompressed)
@@ -90,7 +99,7 @@ namespace ReactiveProtobuf.Protocol
 
             if (_isEncrypted)
             {
-                data = AesHelper.AesEncrypt(data, GetBytes(_encKey.ToString()));
+                data = AesHelper.AesEncrypt(data, GetBytes(_encKey));
             }
 
             var body = data;
