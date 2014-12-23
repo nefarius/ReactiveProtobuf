@@ -16,7 +16,7 @@ namespace ReactiveProtobuf.Protocol
 {
     public class ProtobufChannel<T> : IChannel<T>
     {
-        private IReactiveSocket _socket;
+        private readonly IReactiveSocket _socket;
         private readonly bool _isCompressed;
         private readonly bool _isEncrypted;
         private readonly SecureString _encKey;
