@@ -100,7 +100,7 @@ namespace ReactiveProtobuf.Protocol
 
             if (_isCompressed)
             {
-                data = QuickLZ.compress(data, 1);
+                data = QuickLZ.compress(data, 3);
             }
 
             if (_isEncrypted)
