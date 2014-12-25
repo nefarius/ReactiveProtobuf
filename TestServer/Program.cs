@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using ReactiveProtobuf.Protocol;
 using ReactiveSockets;
@@ -23,6 +24,13 @@ namespace TestServer
                 protocol.Receiver.Subscribe(person =>
                 {
                     Console.WriteLine("Person {0} {1} connected", person.FirstName, person.LastName);
+                });
+
+                var org = new ProtobufChannel<Organization>(socket);
+
+                org.Receiver.Subscribe(organization =>
+                {
+                    Console.WriteLine("Organization {0} connected", organization.Name);
                 });
             });
 

@@ -36,14 +36,14 @@ namespace ReactiveProtobuf.Protocol
                 let retval = BitConverter.ToInt32(header.ToArray(), 0)
                 let length = (retval >= 0) ? retval : 0
                 let body = socket.Receiver.Take(length)
-                select CreateObject(body.ToEnumerable().ToArray());
+                select Deserialize(body.ToEnumerable().ToArray());
         }
 
         public IObservable<T> Receiver { get; private set; }
 
         public Task SendAsync(T message)
         {
-            return _socket.SendAsync(Convert(message));
+            return _socket.SendAsync(Serialize(message));
         }
 
         private static byte[] GetBytes(string str)
@@ -53,7 +53,7 @@ namespace ReactiveProtobuf.Protocol
             return bytes;
         }
 
-        private T CreateObject(byte[] buffer)
+        private T Deserialize(byte[] buffer)
         {
             var data = buffer;
 
@@ -81,7 +81,7 @@ namespace ReactiveProtobuf.Protocol
             }
         }
 
-        private byte[] Convert(T obj)
+        private byte[] Serialize(T obj)
         {
             byte[] data;
 
