@@ -17,11 +17,14 @@ namespace TestClient
         {
             var client = new ReactiveClient("localhost", 41337);
 
-            var protocol = new ProtobufChannel<Person>(client, true, true, "1234");
+            var protocol = new ProtobufChannel<Person>(client);
 
             protocol.Receiver.SubscribeOn(TaskPoolScheduler.Default).Subscribe(person =>
             {
-                Console.WriteLine("Person {0} {1} received", person.FirstName, person.LastName);
+                if (person != null)
+                {
+                    Console.WriteLine("Person {0} {1} received", person.FirstName, person.LastName);
+                }
             });
 
             client.ConnectAsync().Wait();

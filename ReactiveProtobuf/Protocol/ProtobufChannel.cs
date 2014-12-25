@@ -77,7 +77,14 @@ namespace ReactiveProtobuf.Protocol
 
             using (var ms = new MemoryStream(data))
             {
-                return Serializer.Deserialize<T>(ms);
+                try
+                {
+                    return Serializer.Deserialize<T>(ms);
+                }
+                catch (ProtoException)
+                {
+                    return default(T);
+                }
             }
         }
 

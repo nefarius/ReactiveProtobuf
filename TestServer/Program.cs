@@ -19,18 +19,14 @@ namespace TestServer
             {
                 Console.WriteLine("New socket connected {0}", socket.GetHashCode());
 
-                var protocol = new ProtobufChannel<Person>(socket, true, true, "1234");
+                var protocol = new ProtobufChannel<Person>(socket);
 
                 protocol.Receiver.Subscribe(person =>
                 {
-                    Console.WriteLine("Person {0} {1} connected", person.FirstName, person.LastName);
-                });
-
-                var org = new ProtobufChannel<Organization>(socket);
-
-                org.Receiver.Subscribe(organization =>
-                {
-                    Console.WriteLine("Organization {0} connected", organization.Name);
+                    if (person != null)
+                    {
+                        Console.WriteLine("Person {0} {1} connected", person.FirstName, person.LastName);
+                    }
                 });
             });
 
