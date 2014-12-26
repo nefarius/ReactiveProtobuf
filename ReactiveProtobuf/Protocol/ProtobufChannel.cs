@@ -12,6 +12,10 @@ using ReactiveSockets;
 
 namespace ReactiveProtobuf.Protocol
 {
+    /// <summary>
+    /// Implements the <see cref="IChannel{T}"/> over ReactiveSockets.
+    /// </summary>
+    /// <typeparam name="T">The type to get (de-)serialized.</typeparam>
     public class ProtobufChannel<T> : IChannel<T>
     {
         private readonly string _encKey;
@@ -19,11 +23,26 @@ namespace ReactiveProtobuf.Protocol
         private readonly bool _isEncrypted;
         private readonly IReactiveSocket _socket;
 
+        /// <summary>
+        /// Initializes a new protocol channel.
+        /// </summary>
+        /// <param name="socket">The <see cref="IReactiveSocket"/> to subscribe to.</param>
+        /// <param name="isCompressed">True to compress the serialized data, false otherwise.
+        /// The default value is false.</param>
         public ProtobufChannel(IReactiveSocket socket, bool isCompressed)
             : this(socket, isCompressed, false, null)
         {
         }
 
+        /// <summary>
+        /// Initializes a new protocol channel.
+        /// </summary>
+        /// <param name="socket">The <see cref="IReactiveSocket"/> to subscribe to.</param>
+        /// <param name="isCompressed">True to compress the serialized data, false otherwise.
+        /// The default value is false.</param>
+        /// <param name="isEncrypted">True to encrypt the serialized data with a static key.
+        /// The default value is false.</param>
+        /// <param name="encKey">The static key being used to encrypt/decrypt.</param>
         public ProtobufChannel(IReactiveSocket socket, bool isCompressed = false, bool isEncrypted = false,
             string encKey = "")
         {
