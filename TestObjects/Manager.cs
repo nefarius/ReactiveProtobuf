@@ -7,10 +7,8 @@ using ProtoBuf;
 namespace TestObjects
 {
     [ProtoContract(ImplicitFields = ImplicitFields.AllFields)]
-    [ProtoInclude(100, typeof(Manager))]
-    public class Person
+    public class Manager : Person
     {
-        public string LastName { get; set; }
-        public string FirstName { get; set; }
+        public uint Salary { get; set; }
     }
 }

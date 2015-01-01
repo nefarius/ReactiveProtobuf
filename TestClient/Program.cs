@@ -44,6 +44,15 @@ namespace TestClient
             protocol.SendAsync(p1);
             protocol.SendAsync(p2);
 
+            var m1 = new Manager()
+            {
+                FirstName = "U.N.",
+                LastName = "Owen",
+                Salary = 10000
+            };
+
+            protocol.SendAsync(m1);
+
             Console.ReadLine();
         }
     }
