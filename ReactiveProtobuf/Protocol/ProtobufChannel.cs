@@ -13,7 +13,7 @@ using ReactiveSockets;
 namespace ReactiveProtobuf.Protocol
 {
     /// <summary>
-    /// Implements the <see cref="IChannel{T}"/> over ReactiveSockets.
+    ///     Implements the <see cref="IChannel{T}" /> over ReactiveSockets.
     /// </summary>
     /// <typeparam name="T">The type to get (de-)serialized.</typeparam>
     public class ProtobufChannel<T> : IChannel<T>
@@ -24,24 +24,30 @@ namespace ReactiveProtobuf.Protocol
         private readonly IReactiveSocket _socket;
 
         /// <summary>
-        /// Initializes a new protocol channel.
+        ///     Initializes a new protocol channel.
         /// </summary>
-        /// <param name="socket">The <see cref="IReactiveSocket"/> to subscribe to.</param>
-        /// <param name="isCompressed">True to compress the serialized data, false otherwise.
-        /// The default value is false.</param>
+        /// <param name="socket">The <see cref="IReactiveSocket" /> to subscribe to.</param>
+        /// <param name="isCompressed">
+        ///     True to compress the serialized data, false otherwise.
+        ///     The default value is false.
+        /// </param>
         public ProtobufChannel(IReactiveSocket socket, bool isCompressed)
             : this(socket, isCompressed, false, null)
         {
         }
 
         /// <summary>
-        /// Initializes a new protocol channel.
+        ///     Initializes a new protocol channel.
         /// </summary>
-        /// <param name="socket">The <see cref="IReactiveSocket"/> to subscribe to.</param>
-        /// <param name="isCompressed">True to compress the serialized data, false otherwise.
-        /// The default value is false.</param>
-        /// <param name="isEncrypted">True to encrypt the serialized data with a static key.
-        /// The default value is false.</param>
+        /// <param name="socket">The <see cref="IReactiveSocket" /> to subscribe to.</param>
+        /// <param name="isCompressed">
+        ///     True to compress the serialized data, false otherwise.
+        ///     The default value is false.
+        /// </param>
+        /// <param name="isEncrypted">
+        ///     True to encrypt the serialized data with a static key.
+        ///     The default value is false.
+        /// </param>
         /// <param name="encKey">The static key being used to encrypt/decrypt.</param>
         public ProtobufChannel(IReactiveSocket socket, bool isCompressed = false, bool isEncrypted = false,
             string encKey = "")
@@ -58,8 +64,25 @@ namespace ReactiveProtobuf.Protocol
                 select Deserialize(body.ToEnumerable().ToArray());
         }
 
+        /// <summary>
+        ///     The receiving channel to subscribe to.
+        /// </summary>
+        /// <example>
+        /// protocol.Receiver.Subscribe(person =>
+        ///     {
+        ///            if (person != null)
+        ///         {
+        ///             Console.WriteLine("Person {0} {1} connected", person.FirstName, person.LastName);
+        ///         }
+        ///     });
+        /// </example>
         public IObservable<T> Receiver { get; private set; }
 
+        /// <summary>
+        ///     Sends the provided message to all subscribed channels.
+        /// </summary>
+        /// <param name="message">The message to send.</param>
+        /// <returns>The async task.</returns>
         public Task SendAsync(T message)
         {
             return _socket.SendAsync(Serialize(message));
