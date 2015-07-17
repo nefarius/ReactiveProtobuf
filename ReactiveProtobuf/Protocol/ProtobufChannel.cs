@@ -68,12 +68,12 @@ namespace ReactiveProtobuf.Protocol
         ///     The receiving channel to subscribe to.
         /// </summary>
         /// <example>
-        /// protocol.Receiver.Subscribe(person =>
+        ///     protocol.Receiver.Subscribe(person =>
         ///     {
-        ///            if (person != null)
-        ///         {
-        ///             Console.WriteLine("Person {0} {1} connected", person.FirstName, person.LastName);
-        ///         }
+        ///     if (person != null)
+        ///     {
+        ///     Console.WriteLine("Person {0} {1} connected", person.FirstName, person.LastName);
+        ///     }
         ///     });
         /// </example>
         public IObservable<T> Receiver { get; private set; }
@@ -119,14 +119,7 @@ namespace ReactiveProtobuf.Protocol
 
             using (var ms = new MemoryStream(data))
             {
-                try
-                {
-                    return Serializer.Deserialize<T>(ms);
-                }
-                catch (ProtoException)
-                {
-                    return default(T);
-                }
+                return Serializer.Deserialize<T>(ms);
             }
         }
 
