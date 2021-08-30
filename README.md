@@ -1,4 +1,3 @@
-ReactiveProtobuf
-================
+# ReactiveProtobuf
 
-Work in progress :-)
+An old experiment, do not use 😅
